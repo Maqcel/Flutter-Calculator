@@ -33,53 +33,72 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     //1
     Icon(Icons.delete_outline), 7, 4, 1, Icon(MdiIcons.plusMinus),
     //2
-    Icon(Icons.backspace), 8, 5, 2, 0,
+    Icon(Icons.keyboard_backspace), 8, 5, 2, 0,
     //3
     Icon(MdiIcons.percent), 9, 6, 3, '.',
     //4
-    Icon(MdiIcons.division), Icon(MdiIcons.closeThick), Icon(MdiIcons.minus), Icon(MdiIcons.plusThick), Icon(MdiIcons.equal),
+    Icon(MdiIcons.division), Icon(MdiIcons.closeThick), Icon(MdiIcons.minus),
+    Icon(MdiIcons.plusThick), Icon(MdiIcons.equal),
   ];
 
   String equation = '';
   String result = '0';
   String expression = '';
+  String lastEquation = '';
 
   void _tapped(List<Object> content, int index) {
     setState(() {
-      if (content[index] == content[0] ) { //clear
+      if (content[index] == content[0]) {
+        //clear
         equation = '';
         result = '0';
-      } else if (content[index] == content[5]) { //backspace
+      }else if(content[index] == content[4]&&equation.isNotEmpty){
+        equation = changeSign(equation);
+      } else if (content[index] == content[5]) {
+        //backspace
         equation = equation.substring(0, equation.length - 1);
         if (equation.isEmpty) equation = '0';
-      } else if (content[index] == content[19]) { // =
+/*equal*/
+      } else if (content[index] == content[19]&&equation.isNotEmpty&&!equation.startsWith('-')) {
         expression = equation;
-        equation = '';
         expression = expression.replaceAll('×', '*');
         expression = expression.replaceAll('÷', '/');
-        try{
+        try {
           Parser p = new Parser();
           Expression exp = p.parse(expression);
 
           ContextModel cm = ContextModel();
           result = '${exp.evaluate(EvaluationType.REAL, cm)}';
-        }catch(e){
-          result = 'ERROR';
+        } catch (e) {
+          result = 'ERROR TRY AGAIN!';
         }
-
+        lastEquation = equation;
+        equation = '';
       } else {
-        if (content[index] == content[10]) {
-          equation += '%';
-        } else if (content[index] == content[15]) {
-          equation += '÷';
-        } else if (content[index] == content[16]) {
-          equation += '×';
-        } else if (content[index] == content[17]) {
-          equation += '-';
-        } else if (content[index] == content[18]) {
-          equation += '+';
+        if (content[index] == content[10] && equation.isNotEmpty) {
+          equation.length == 1
+              ? isDigit(equation, 0) ? equation += '%' : equation += ''
+              : equation += '%';
+        } else if (content[index] == content[15] && equation.isNotEmpty) {
+          equation.length == 1
+              ? isDigit(equation, 0) ? equation += '÷' : equation += ''
+              : equation += '÷';
+        } else if (content[index] == content[16] && equation.isNotEmpty) {
+          equation.length == 1
+              ? isDigit(equation, 0) ? equation += '×' : equation += ''
+              : equation += '×';
+        } else if (content[index] == content[17] && !equation.startsWith('-')) {
+          equation.length == 1
+              ? isDigit(equation, 0) ? equation += '-' : equation += ''
+              : equation += '-';
+        } else if (content[index] == content[18] && equation.isNotEmpty) {
+          equation.length == 1
+              ? isDigit(equation, 0) ? equation += '+' : equation += ''
+              : equation += '+';
         } else {
-          equation += content[index].toString();
+          equation += content[index].toString().length > 1
+              ? ''
+              : content[index].toString();
         }
       }
       //print(equation);
@@ -113,6 +132,13 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                     child: Text(
                       result,
                       style: TextStyle(fontSize: 40, color: Colors.black54),
+                    ),
+                  ),
+                  if(lastEquation.isNotEmpty&&result!='ERROR TRY AGAIN!') Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      lastEquation,
+                      style: TextStyle(fontSize: 23, color: Colors.black38),
                     ),
                   ),
                 ],

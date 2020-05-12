@@ -41,10 +41,29 @@ Widget buildColumn(
     crossAxisAlignment: CrossAxisAlignment.center,
   );
 }
+
 bool isDigit(String s, int idx) => (s.codeUnitAt(idx) ^ 0x30) <= 9;
-String changeSign(String exp){
+String changeSign(String exp) {
   String modified = exp;
-  bool cond = true;
-   
-  return  modified;
+  int i = modified.length-1;
+  if(modified.length==1){
+    return modified = '-' + modified;
+  }
+  while (isDigit(modified, i)) {
+    i--;
+    if(i==-1) break;
+  }
+  if (i > 0) {
+    if (modified[i] == '+') {
+      modified = modified.substring(0, i) +
+          '-' +
+          modified.substring(i+1, exp.length);
+    } else if (modified[i] == '-') {
+      modified = modified.substring(0,i) + modified.substring(i+1,exp.length);
+    }
+  }else if(i==-1){
+    return '-' + modified;
+  }
+  else return modified.substring(1,modified.length);
+  return modified;
 }
