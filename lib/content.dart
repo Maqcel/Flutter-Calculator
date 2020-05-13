@@ -11,6 +11,7 @@ Widget buildContainer(
       borderRadius: BorderRadius.all(
         Radius.circular(5),
       ),
+      border: Border.all(width: 1, color: Colors.black87),
     ),
     child: FlatButton(
       child: Center(
@@ -29,14 +30,14 @@ Widget buildContainer(
 }
 
 Widget buildColumn(
-    Size size, List<Object> content, int index, Function tapped) {
+    Size size, List<Object> content, int index, Function tapped, int howMuch) {
+  //add flex!
   return Column(
     children: <Widget>[
-      buildContainer(size, content, index, tapped),
-      buildContainer(size, content, index + 1, tapped),
-      buildContainer(size, content, index + 2, tapped),
-      buildContainer(size, content, index + 3, tapped),
-      buildContainer(size, content, index + 4, tapped),
+      for (int i = 0; i < howMuch; i++)
+        Expanded(
+          child: buildContainer(size, content, index + i, tapped),
+        ),
     ],
     crossAxisAlignment: CrossAxisAlignment.center,
   );
@@ -45,25 +46,26 @@ Widget buildColumn(
 bool isDigit(String s, int idx) => (s.codeUnitAt(idx) ^ 0x30) <= 9;
 String changeSign(String exp) {
   String modified = exp;
-  int i = modified.length-1;
-  if(modified.length==1){
+  int i = modified.length - 1;
+  if (modified.length == 1) {
     return modified = '-' + modified;
   }
   while (isDigit(modified, i)) {
     i--;
-    if(i==-1) break;
+    if (i == -1) break;
   }
   if (i > 0) {
     if (modified[i] == '+') {
       modified = modified.substring(0, i) +
           '-' +
-          modified.substring(i+1, exp.length);
+          modified.substring(i + 1, exp.length);
     } else if (modified[i] == '-') {
-      modified = modified.substring(0,i) + modified.substring(i+1,exp.length);
+      modified =
+          modified.substring(0, i) + modified.substring(i + 1, exp.length);
     }
-  }else if(i==-1){
+  } else if (i == -1) {
     return '-' + modified;
-  }
-  else return modified.substring(1,modified.length);
+  } else
+    return modified.substring(1, modified.length);
   return modified;
 }

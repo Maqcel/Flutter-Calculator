@@ -1,3 +1,5 @@
+import 'package:calculator/main_drawer.dart';
+
 import 'content.dart';
 
 import 'package:flutter/material.dart';
@@ -52,14 +54,16 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
         //clear
         equation = '';
         result = '0';
-      }else if(content[index] == content[4]&&equation.isNotEmpty){
+      } else if (content[index] == content[4] && equation.isNotEmpty) {
         equation = changeSign(equation);
       } else if (content[index] == content[5]) {
         //backspace
         equation = equation.substring(0, equation.length - 1);
         if (equation.isEmpty) equation = '0';
 /*equal*/
-      } else if (content[index] == content[19]&&equation.isNotEmpty&&!equation.startsWith('-')) {
+      } else if (content[index] == content[19] &&
+          equation.isNotEmpty &&
+          !equation.startsWith('-')) {
         expression = equation;
         expression = expression.replaceAll('×', '*');
         expression = expression.replaceAll('÷', '/');
@@ -105,14 +109,24 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     });
   }
 
+  void _extratapped(List<Object> content, int index) {
+    print('hello');
+  }
+
   @override
   Widget build(BuildContext context) {
     final _screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text('Calculator')),
-        backgroundColor: Colors.black87,
-      ),
+      appBar: _screenSize.height >= 700
+          ? AppBar(
+              title: Container(
+                margin: EdgeInsets.symmetric(horizontal: _screenSize.width/5),
+                child: Text('Calculator'),
+              ),
+              backgroundColor: Colors.black87,
+            )
+          : null,
+      drawer: MainDrawer(_extratapped),
       body: Container(
         child: Column(
           children: <Widget>[
@@ -134,29 +148,28 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                       style: TextStyle(fontSize: 40, color: Colors.black54),
                     ),
                   ),
-                  if(lastEquation.isNotEmpty&&result!='ERROR TRY AGAIN!') Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      lastEquation,
-                      style: TextStyle(fontSize: 23, color: Colors.black38),
+                  if (lastEquation.isNotEmpty && result != 'ERROR TRY AGAIN!')
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        lastEquation,
+                        style: TextStyle(fontSize: 23, color: Colors.black38),
+                      ),
                     ),
-                  ),
                 ],
                 //crossAxisAlignment: CrossAxisAlignment.end,
               ),
               padding: EdgeInsets.symmetric(horizontal: 10),
               color: Colors.black54,
-              height: _screenSize.height * 0.28,
+              height: _screenSize.height * 0.25,
             ),
             Expanded(
               child: Container(
                 color: Colors.black87,
                 child: Row(
                   children: <Widget>[
-                    buildColumn(_screenSize, content, 0, _tapped),
-                    buildColumn(_screenSize, content, 5, _tapped),
-                    buildColumn(_screenSize, content, 10, _tapped),
-                    buildColumn(_screenSize, content, 15, _tapped),
+                    for (int i = 0; i < 20; i += 5)
+                      buildColumn(_screenSize, content, i, _tapped, 5),
                   ],
                 ),
               ),
