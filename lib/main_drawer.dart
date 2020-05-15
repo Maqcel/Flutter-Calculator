@@ -1,6 +1,21 @@
+import 'package:calculator/readme.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'content.dart';
+
+class MainDrawerCondition extends StatelessWidget {
+  final bool firstAdvanced;
+  final Function _readClose;
+  final Function _extraTapped;
+
+  const MainDrawerCondition(
+      this.firstAdvanced, this._readClose, this._extraTapped);
+
+  @override
+  Widget build(BuildContext context) {
+    return firstAdvanced ? MainDrawer(_extraTapped) : ReadMe();
+  }
+}
 
 class MainDrawer extends StatelessWidget {
   final Function _function;
@@ -12,7 +27,7 @@ class MainDrawer extends StatelessWidget {
     //3
     Icon(MdiIcons.squareRoot), Icon(MdiIcons.mathSin), Icon(MdiIcons.mathLog),
     //6
-    Icon(MdiIcons.pi), Icon(MdiIcons.exclamation), Icon(MdiIcons.exponent),
+    '(', ')', Icon(MdiIcons.exponent),
   ];
 
   MainDrawer(this._function);
@@ -21,7 +36,7 @@ class MainDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final _screenSize = MediaQuery.of(context).size;
     return Container(
-      width: _screenSize.width*0.75,
+      width: _screenSize.width * 0.75,
       child: Drawer(
         child: Column(
           children: <Widget>[
@@ -40,7 +55,7 @@ class MainDrawer extends StatelessWidget {
               ),
             ),
             Container(
-              height: _screenSize.height-120,
+              height: _screenSize.height - 120,
               color: Colors.black54,
               child: Row(
                 children: <Widget>[

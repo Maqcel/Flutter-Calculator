@@ -1,4 +1,5 @@
 import 'package:calculator/main_drawer.dart';
+import 'package:calculator/readme.dart';
 
 import 'content.dart';
 
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => MyHomeScreen(),
+        ReadMe.routeName: (context) => ReadMe(),
       },
     );
   }
@@ -47,6 +49,9 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
   String result = '0';
   String expression = '';
   String lastEquation = '';
+  bool insideLog = false;
+  bool insideFunc = false;
+  bool firstAdvanced = false;
 
   void _tapped(List<Object> content, int index) {
     setState(() {
@@ -66,6 +71,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
           !equation.startsWith('-')) {
         expression = equation;
         expression = expression.replaceAll('×', '*');
+        //expression = expression.replaceAll('π', '3.14159265359');
         expression = expression.replaceAll('÷', '/');
         try {
           Parser p = new Parser();
@@ -78,6 +84,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
         }
         lastEquation = equation;
         equation = '';
+        insideLog = false;
+        insideFunc = false;
       } else {
         if (content[index] == content[10] && equation.isNotEmpty) {
           equation.length == 1
@@ -109,8 +117,24 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     });
   }
 
+  void _readClose() {
+    print('No ten');
+    firstAdvanced = true;
+  }
+
   void _extratapped(List<Object> content, int index) {
-    print('hello');
+    setState(() {
+      if (content[index] == content[6]) {
+        if (equation.length == 0)
+          equation += '(';
+        else if (equation[equation.length - 1] != ')') equation += '(';
+      }
+      if (content[index] == content[7]) {
+        if (equation.length == 0)
+          equation += '(';
+        else if (equation[equation.length - 1] != '(') equation += ')';
+      }
+    });
   }
 
   @override
@@ -120,13 +144,13 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
       appBar: _screenSize.height >= 700
           ? AppBar(
               title: Container(
-                margin: EdgeInsets.symmetric(horizontal: _screenSize.width/5),
+                margin: EdgeInsets.symmetric(horizontal: _screenSize.width / 5),
                 child: Text('Calculator'),
               ),
               backgroundColor: Colors.black87,
             )
           : null,
-      drawer: MainDrawer(_extratapped),
+      drawer: MainDrawerCondition(firstAdvanced, _readClose, _extratapped),
       body: Container(
         child: Column(
           children: <Widget>[
