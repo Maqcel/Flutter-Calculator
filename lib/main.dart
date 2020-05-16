@@ -1,13 +1,19 @@
 import 'package:calculator/main_drawer.dart';
+import 'package:calculator/readme.dart';
+import 'package:calculator/states.dart';
+import 'package:provider/provider.dart';
 
 import 'content.dart';
 
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:math_expressions/math_expressions.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => StateManagement())],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -25,108 +31,24 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomeScreen extends StatefulWidget {
-  @override
-  _MyHomeScreenState createState() => _MyHomeScreenState();
-}
-
-class _MyHomeScreenState extends State<MyHomeScreen> {
-  List<Object> content = [
-    //1
-    Icon(Icons.delete_outline), 7, 4, 1, Icon(MdiIcons.plusMinus),
-    //2
-    Icon(Icons.keyboard_backspace), 8, 5, 2, 0,
-    //3
-    Icon(MdiIcons.percent), 9, 6, 3, '.',
-    //4
-    Icon(MdiIcons.division), Icon(MdiIcons.closeThick), Icon(MdiIcons.minus),
-    Icon(MdiIcons.plusThick), Icon(MdiIcons.equal),
-  ];
-
-  String equation = '';
-  String result = '0';
-  String expression = '';
-  String lastEquation = '';
-
-  void _tapped(List<Object> content, int index) {
-    setState(() {
-      if (content[index] == content[0]) {
-        //clear
-        equation = '';
-        result = '0';
-      } else if (content[index] == content[4] && equation.isNotEmpty) {
-        equation = changeSign(equation);
-      } else if (content[index] == content[5]) {
-        //backspace
-        equation = equation.substring(0, equation.length - 1);
-        if (equation.isEmpty) equation = '0';
-/*equal*/
-      } else if (content[index] == content[19] &&
-          equation.isNotEmpty &&
-          !equation.startsWith('-')) {
-        expression = equation;
-        expression = expression.replaceAll('×', '*');
-        expression = expression.replaceAll('÷', '/');
-        try {
-          Parser p = new Parser();
-          Expression exp = p.parse(expression);
-
-          ContextModel cm = ContextModel();
-          result = '${exp.evaluate(EvaluationType.REAL, cm)}';
-        } catch (e) {
-          result = 'ERROR TRY AGAIN!';
-        }
-        lastEquation = equation;
-        equation = '';
-      } else {
-        if (content[index] == content[10] && equation.isNotEmpty) {
-          equation.length == 1
-              ? isDigit(equation, 0) ? equation += '%' : equation += ''
-              : equation += '%';
-        } else if (content[index] == content[15] && equation.isNotEmpty) {
-          equation.length == 1
-              ? isDigit(equation, 0) ? equation += '÷' : equation += ''
-              : equation += '÷';
-        } else if (content[index] == content[16] && equation.isNotEmpty) {
-          equation.length == 1
-              ? isDigit(equation, 0) ? equation += '×' : equation += ''
-              : equation += '×';
-        } else if (content[index] == content[17] && !equation.startsWith('-')) {
-          equation.length == 1
-              ? isDigit(equation, 0) ? equation += '-' : equation += ''
-              : equation += '-';
-        } else if (content[index] == content[18] && equation.isNotEmpty) {
-          equation.length == 1
-              ? isDigit(equation, 0) ? equation += '+' : equation += ''
-              : equation += '+';
-        } else {
-          equation += content[index].toString().length > 1
-              ? ''
-              : content[index].toString();
-        }
-      }
-      //print(equation);
-    });
-  }
-
-  void _extratapped(List<Object> content, int index) {
-    print('hello');
-  }
-
+class MyHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final stateManagement = Provider.of<StateManagement>(context);
     final _screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: _screenSize.height >= 700
           ? AppBar(
               title: Container(
-                margin: EdgeInsets.symmetric(horizontal: _screenSize.width/5),
+                margin: EdgeInsets.symmetric(horizontal: _screenSize.width / 5),
                 child: Text('Calculator'),
               ),
               backgroundColor: Colors.black87,
             )
           : null,
-      drawer: MainDrawer(_extratapped),
+      drawer: stateManagement.firstAdvanced
+          ? MainDrawer(stateManagement.extratapped)
+          : ReadMe(),
       body: Container(
         child: Column(
           children: <Widget>[
@@ -136,7 +58,9 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      equation.isEmpty ? '0' : equation,
+                      stateManagement.equation.isEmpty
+                          ? '0'
+                          : stateManagement.equation,
                       style: TextStyle(fontSize: 40),
                     ),
                   ),
@@ -144,15 +68,16 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      result,
+                      stateManagement.result,
                       style: TextStyle(fontSize: 40, color: Colors.black54),
                     ),
                   ),
-                  if (lastEquation.isNotEmpty && result != 'ERROR TRY AGAIN!')
+                  if (stateManagement.lastEquation.isNotEmpty &&
+                      stateManagement.result.toString() != 'ERROR TRY AGAIN!')
                     Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        lastEquation,
+                        stateManagement.lastEquation,
                         style: TextStyle(fontSize: 23, color: Colors.black38),
                       ),
                     ),
@@ -169,7 +94,8 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                 child: Row(
                   children: <Widget>[
                     for (int i = 0; i < 20; i += 5)
-                      buildColumn(_screenSize, content, i, _tapped, 5),
+                      buildColumn(_screenSize, stateManagement.content, i,
+                          stateManagement.tapped, 5),
                   ],
                 ),
               ),

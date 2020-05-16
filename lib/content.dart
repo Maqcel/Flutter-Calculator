@@ -44,13 +44,14 @@ Widget buildColumn(
 }
 
 bool isDigit(String s, int idx) => (s.codeUnitAt(idx) ^ 0x30) <= 9;
+
 String changeSign(String exp) {
   String modified = exp;
   int i = modified.length - 1;
   if (modified.length == 1) {
     return modified = '-' + modified;
   }
-  while (isDigit(modified, i)) {
+  while (isDigit(modified, i)||exp[i]=='.') {
     i--;
     if (i == -1) break;
   }
