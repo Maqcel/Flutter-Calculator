@@ -1,9 +1,8 @@
-import 'package:calculator/readme.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'content.dart';
 
-class MainDrawerCondition extends StatelessWidget {
+/*class MainDrawerCondition extends StatelessWidget {
   final bool firstAdvanced;
   final Function _readClose;
   final Function _extraTapped;
@@ -15,7 +14,7 @@ class MainDrawerCondition extends StatelessWidget {
   Widget build(BuildContext context) {
     return firstAdvanced ? MainDrawer(_extraTapped) : ReadMe();
   }
-}
+}*/
 
 class MainDrawer extends StatelessWidget {
   final Function _function;
