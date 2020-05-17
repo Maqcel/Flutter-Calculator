@@ -104,7 +104,7 @@ class ReadMe extends StatelessWidget {
                       FontWeight.normal,
                       _screenSize.width * 0.05 + _screenSize.height * 0.0005,
                       Colors.black87,
-                      '', // TODO: Check how log works
+                      'Logarithm function after clicking the button on screen the body will apear: \'ln(\' after this you can pass the value of natural logarithm you want to count, and remember to close function with \')\'',
                       Icon(MdiIcons.mathLog),
                       true,
                     ),
